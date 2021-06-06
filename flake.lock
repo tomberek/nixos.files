@@ -1,0 +1,27 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1622915565,
+        "narHash": "sha256-v/sJJUg3t3wv8LRyeaP8upFqO9RfLyJaEHTWIp/ht1Q=",
+        "ref": "sourcehut_major",
+        "rev": "6c4a9c6c6eecd588ad936986b1c102b90aa2a79e",
+        "revCount": 287375,
+        "type": "git",
+        "url": "file:///etc/nixos/nixpkgs"
+      },
+      "original": {
+        "ref": "sourcehut_major",
+        "type": "git",
+        "url": "file:///etc/nixos/nixpkgs"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

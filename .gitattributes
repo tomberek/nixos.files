@@ -1,0 +1,4 @@
+keys/** filter=git-crypt diff=git-crypt
+sourcehut.nix filter=git-crypt diff=git-crypt
+wg/** filter=git-crypt diff=git-crypt
+.gitattributes !filter !diff
