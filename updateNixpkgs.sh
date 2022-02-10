@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-pushd nixpkgs
-git add -A
-git commit --amend --no-edit
-popd
+#pushd nixpkgs
+#git add -A
+#git commit --amend --no-edit
+#popd
 
 nix flake update --update-input nixpkgs #--option substituters ''
 nixos-rebuild switch --impure -L --fast #--option substituters ''

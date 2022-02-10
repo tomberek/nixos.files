@@ -13,9 +13,9 @@
     ./grub.nix
     ./networking.nix
     ./environment.nix
-    # ./minecraft.nix
     ./hydra.nix
     ./sourcehut.nix
+    ./buildkite.nix
   ];
 
   nix.buildCores = 3;
@@ -24,12 +24,13 @@
     "nixos-config=/etc/nixos/configuration.nix"
     "nixos=/etc/nixos/nixpkgs/nixos"
   ];
-  nix.package = pkgs.nixFlakes;
+  nix.package = pkgs.nixUnstable;
   nix.extraOptions = ''
     experimental-features = nix-command flakes
     auto-optimise-store = true
     gc-keep-outputs = true
     gc-keep-derivations = true
+    extra-trusted-public-keys = tframe-tomberek.info-1:mbb/hj+juXREwCLtaoH5ItESxyJEXD1uqbu+LUTvfcs=
   '';
   nix.gc.automatic = true;
   nix.gc.dates = "weekly";
@@ -78,4 +79,5 @@
 
   time.hardwareClockInLocalTime = true;
   time.timeZone = "America/New_York";
+  
 }

@@ -7,6 +7,17 @@ let
     join config.networking.hostName config.networking.domain;
 in
 rec {
+  imports = [
+    ./tinc.nix 
+    ./innernet.nix 
+  ];
+  services.innernet = {
+    enable = false;
+    configFile = "/etc/innernet-server/tomberek.conf";
+    interfaceName = "tomberek";
+    openFirewall = true;
+  };
+
 
   environment.systemPackages = with pkgs; [
     mosh
@@ -56,25 +67,6 @@ rec {
         '';
       };
     };
-
-
-
-  services.dnsmasq = {
-    enable = false;
-    extraConfig = ''
-      domain-needed
-      bogus-priv
-      filterwin2k
-      no-poll
-      no-hosts
-      no-negcache
-      bind-interfaces
-      interface=tinc.solar
-      dhcp-range=tinc.solar,10.0.0.2,10.0.0.200,365d
-      dhcp-option=3
-      dhcp-option=6
-    '';
-  };
 
   services.dovecot2 = {
     enable = true;
@@ -212,13 +204,13 @@ rec {
     "builds.srht.tomberek.info"
     "dispatch.srht.tomberek.info"
     "git.srht.tomberek.info"
-    "hg.srht.tomberek.info"
     "hub.srht.tomberek.info"
     "lists.srht.tomberek.info"
     "man.srht.tomberek.info"
     "meta.srht.tomberek.info"
     "paste.srht.tomberek.info"
     "todo.srht.tomberek.info"
+    "hydra.tomberek.info"
   ];
   services.nginx = {
     enable = true;
@@ -235,18 +227,30 @@ rec {
           include       ${pkgs.nginx}/conf/mime.types;
           default_type  application/octet-stream;
         '';
-        locations."/hydra/" = {
-          proxyPass = "http://127.0.0.1:3000/";
-          extraConfig = ''
-            proxy_redirect http://127.0.0.1:3000 https://${fqdn}/hydra;
+        # locations."/hydra/" = {
+        #   proxyPass = "http://127.0.0.1:3000/";
+        #   extraConfig = ''
+        #     proxy_redirect http://127.0.0.1:3000 https://${fqdn}/hydra;
 
-            proxy_set_header  Host              $host;
-            proxy_set_header  X-Real-IP         $remote_addr;
-            proxy_set_header  X-Forwarded-For   https://$proxy_add_x_forwarded_for;
-            proxy_set_header  X-Forwarded-Proto $scheme;
-            proxy_set_header  X-Forwarded-Port 443;
-            proxy_set_header  X-Request-Base    /hydra;
-          '';
+        #     proxy_set_header  Host              $host;
+        #     proxy_set_header  X-Real-IP         $remote_addr;
+        #     proxy_set_header  X-Forwarded-For   https://$proxy_add_x_forwarded_for;
+        #     proxy_set_header  X-Forwarded-Proto $scheme;
+        #     proxy_set_header  X-Forwarded-Port 443;
+        #     proxy_set_header  X-Request-Base    /hydra;
+        #   '';
+        # };
+      };
+      "hydra.${fqdn}" = {
+        forceSSL = true;
+        useACMEHost = fqdn;
+        locations = {
+          "/cache" = {
+	        root = "/var/cache/hydra/nar-cache";
+	      };
+          "/" = {
+	        proxyPass = "http://127.0.0.1:3000";
+	      };
         };
       };
       "srht.${fqdn}" = {
@@ -259,9 +263,6 @@ rec {
         useACMEHost = fqdn;
       };
       "lists.srht.${fqdn}" = {
-        useACMEHost = fqdn;
-      };
-      "hg.srht.${fqdn}" = {
         useACMEHost = fqdn;
       };
       "hub.srht.${fqdn}" = {
@@ -285,47 +286,47 @@ rec {
     };
 
     sslCiphers = "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384";
-    appendHttpConfig = ''
-      add_header Strict-Transport-Security "max-age=15638400; includeSubDomains; preload";
-      add_header        X-Frame-Options SAMEORIGIN;
-      add_header        X-Content-Type-Options nosniff;
-      add_header        X-XSS-Protection "1; mode=block";
-      # for more security use: add_header        Content-Security-Policy 
-      add_header Access-Control-Allow-Origin $http_origin;
-      add_header Access-Control-Allow-Credentials true;
-      add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
-      add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Mx-ReqToken,X-Requested-With';
+    # appendHttpConfig = ''
+    #   add_header Strict-Transport-Security "max-age=15638400; includeSubDomains; preload";
+    #   add_header        X-Frame-Options SAMEORIGIN;
+    #   add_header        X-Content-Type-Options nosniff;
+    #   add_header        X-XSS-Protection "1; mode=block";
+    #   # for more security use: add_header        Content-Security-Policy 
+    #   add_header Access-Control-Allow-Origin $http_origin;
+    #   add_header Access-Control-Allow-Credentials true;
+    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+    #   add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Mx-ReqToken,X-Requested-With';
 
-      ssl_dhparam       /etc/ssl/certs/dhparam.pem;
-      resolver          8.8.8.8 8.8.4.4 valid=300s;
-      resolver_timeout  5s;
-      ssl_trusted_certificate /etc/ssl/ca-certs.pem;
-    '';
+    #   ssl_dhparam       /etc/ssl/certs/dhparam.pem;
+    #   resolver          8.8.8.8 8.8.4.4 valid=300s;
+    #   resolver_timeout  5s;
+    #   ssl_trusted_certificate /etc/ssl/ca-certs.pem;
+    # '';
   };
 
   networking = {
+    wireguard.enable = true;
     hosts = {
       "127.0.0.1" = [ "meta.sr.ht.local" "git.sr.ht.local" "todo.sr.ht.local" ];
     };
-    nat.enable = true;
-    nat.externalInterface = "eno1";
-    nat.internalInterfaces = [ "wg0" ];
-    wireguard.interfaces = {
-      wg0 = {
-        ips = [ "10.100.0.1/24" ];
-        listenPort = 51820;
-        privateKeyFile = "/etc/nixos/wg/private";
-        peers = [
-          {
-            publicKey = "6SJ9I/MOEFnXuXr3JH4TQo1erC81Ha+mZXYndkZE5A4=";
-            allowedIPs = [ "10.100.0.2/32" ];
-            persistentKeepalive = 25;
-          }
-        ];
-      };
-    };
-    enableIPv6 = false;
-    # interfaces."tinc.solar".ipv4.addresses = [{address = "10.0.0.1"; prefixLength = 24;}];
+    # nat.enable = true;
+    # nat.externalInterface = "eno1";
+    # nat.internalInterfaces = [ "wg0" ];
+    # wireguard.interfaces = {
+    #   wg0 = {
+    #     ips = [ "10.100.0.1/24" ];
+    #     listenPort = 51820;
+    #     privateKeyFile = "/etc/nixos/wg/private";
+    #     peers = [
+    #       {
+    #         publicKey = "6SJ9I/MOEFnXuXr3JH4TQo1erC81Ha+mZXYndkZE5A4=";
+    #         allowedIPs = [ "10.100.0.2/32" ];
+    #         persistentKeepalive = 25;
+    #       }
+    #     ];
+    #   };
+    # };
+    enableIPv6 = true;
     hostName = "tomberek";
     domain = "info";
     wireless.enable = false;
@@ -333,11 +334,12 @@ rec {
 
     firewall = {
       checkReversePath = false;
-      logReversePathDrops = true;
-      logRefusedConnections = true;
-      logRefusedPackets = true;
+      #logReversePathDrops = true;
+      #logRefusedConnections = true;
+      #logRefusedPackets = true;
       enable = true;
       allowedTCPPorts = [
+12981
         22
         53
         80
@@ -346,17 +348,17 @@ rec {
         2002
         25
         587
-        655 # tinc
         3389
         8000
         25565
+        51820
       ];
-      allowedUDPPorts = [ 53 655 67 68 51820 24454 ];
+      allowedUDPPorts = [ 53 67 68 2086 51820 24454 6666 7777 ];
       allowPing = true;
-      extraCommands = ''
-        iptables -A nixos-fw -i tinc.tomberek -p gre -j nixos-fw-accept 
-        iptables -t nat -A POSTROUTING -p all -o eno1 -j MASQUERADE
-      '';
+      # extraCommands = ''
+      #   iptables -A nixos-fw -i tinc.tomberek -p gre -j nixos-fw-accept 
+      #   iptables -t nat -A POSTROUTING -p all -o eno1 -j MASQUERADE
+      # '';
     };
   };
 
@@ -382,17 +384,12 @@ rec {
     publish.userServices = true;
   };
 
-  services.tinc.networks.tomberek = {
-    name = "tomberek";
-    interfaceType = "tap";
-    # chroot = false;
-    extraConfig = ''
-      Mode=switch
-      AutoConnect = yes
-      LocalDiscovery = yes
-    '';
-    listenAddress = "0.0.0.0 655";
-  };
+  
+
+
+
+
+
 
 
   services.cron.systemCronJobs = [

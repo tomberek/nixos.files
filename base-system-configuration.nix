@@ -44,10 +44,10 @@
   };
 
   environment.systemPackages = with pkgs; [
-    gitMinimal
-    mercurial
-    curl
-    gnupg
+    #gitMinimal
+    #mercurial
+    #curl
+    #gnupg
   ];
 }
 

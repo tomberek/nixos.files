@@ -1,0 +1,19 @@
+diff --git a/src/root/build.tt b/src/root/build.tt
+index 0848da4a..b5786c9b 100644
+--- a/src/root/build.tt
++++ b/src/root/build.tt
+@@ -352,6 +352,13 @@ END;
+           <th>Nix expression:</th>
+           <td>file <tt>[% HTML.escape(eval.nixexprpath) %]</tt> in input <tt>[% HTML.escape(eval.nixexprinput) %]</tt></td>
+         </tr>
++      [% ELSE %]
++          [% IF eval.flake %]
++            <tr>
++              <th>Flake Ref:</th>
++              <td>[% HTML.escape(eval.nixexprpath) %]</td>
++            </tr>
++          [% END %]
+       [% END %]
+       <tr>
+         <th>Nix name:</th>
+

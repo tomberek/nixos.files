@@ -2,18 +2,18 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1623427436,
-        "narHash": "sha256-vgCC7UGjY2hNpF+8PD0K6b9noxRUKdvEeTD7czihyjQ=",
-        "ref": "sourcehut-builds-qemu-image",
-        "rev": "df772bccbed3cc73191247949197a17b0ca887d3",
-        "revCount": 294111,
-        "type": "git",
-        "url": "file:///etc/nixos/nixpkgs"
+        "lastModified": 1644359234,
+        "narHash": "sha256-u/sBnRgrFrn9W8gZMS6vN3ZnJsoTvbws968TpqwlDJQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c5051e2b5fe9fab43a64f0e0d06b62c81a890b90",
+        "type": "github"
       },
       "original": {
-        "ref": "sourcehut-builds-qemu-image",
-        "type": "git",
-        "url": "file:///etc/nixos/nixpkgs"
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "root": {
