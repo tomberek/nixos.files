@@ -13,7 +13,7 @@
     ];
   };
   services.buildkite-agents.builder-2 = {
-    enable = true;
+    enable = false;
     tokenPath = "/etc/nixos/keys/buildkite.txt";
     #privateSshKeyPath = "/path/to/ssh/key";
     runtimePackages = [

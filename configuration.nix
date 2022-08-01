@@ -14,7 +14,7 @@
     ./networking.nix
     ./environment.nix
     ./hydra.nix
-    ./sourcehut.nix
+    # ./sourcehut.nix
     ./buildkite.nix
   ];
 
@@ -24,7 +24,7 @@
     "nixos-config=/etc/nixos/configuration.nix"
     "nixos=/etc/nixos/nixpkgs/nixos"
   ];
-  nix.package = pkgs.nixUnstable;
+  # nix.package = (builtins.getFlake "github:NixOS/nix/69c6fb12eea414382f0b945c0d6c574c43c7c9a3").packages.x86_64-linux.nix;
   nix.extraOptions = ''
     experimental-features = nix-command flakes
     auto-optimise-store = true

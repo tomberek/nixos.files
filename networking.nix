@@ -205,6 +205,7 @@ rec {
     "dispatch.srht.tomberek.info"
     "git.srht.tomberek.info"
     "hub.srht.tomberek.info"
+    "mc.tomberek.info"
     "lists.srht.tomberek.info"
     "man.srht.tomberek.info"
     "meta.srht.tomberek.info"
@@ -241,11 +242,29 @@ rec {
         #   '';
         # };
       };
+      "mc.${fqdn}" = {
+        forceSSL = true;
+        useACMEHost = fqdn;
+          locations."/" = {
+            proxyPass = "http://192.168.1.181:9091/";
+	      };
+        #   extraConfig = ''
+        #     proxy_redirect http://127.0.0.1:3000 https://${fqdn}/hydra;
+
+        #     proxy_set_header  Host              $host;
+        #     proxy_set_header  X-Real-IP         $remote_addr;
+        #     proxy_set_header  X-Forwarded-For   https://$proxy_add_x_forwarded_for;
+        #     proxy_set_header  X-Forwarded-Proto $scheme;
+        #     proxy_set_header  X-Forwarded-Port 443;
+        #     proxy_set_header  X-Request-Base    /hydra;
+        #   '';
+        # };
+      };
       "hydra.${fqdn}" = {
         forceSSL = true;
         useACMEHost = fqdn;
         locations = {
-          "/cache" = {
+          "/cache/" = {
 	        root = "/var/cache/hydra/nar-cache";
 	      };
           "/" = {
